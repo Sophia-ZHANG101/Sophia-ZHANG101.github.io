@@ -12,8 +12,9 @@
 <meta property="og:title" content="XIAI JEWELRY · Pearl Jewelry from Zhuji, China">
 <meta property="og:description" content="Saltwater and freshwater pearl jewelry from Shanxiahu, Zhuji. Retail, wholesale and custom orders.">
 <meta property="og:url" content="https://sophia-zhang101.github.io/">
-<meta property="og:image" content="https://sophia-zhang101.github.io/images/hero-gold-pendant.jpg">
-<link rel="stylesheet" href="fonts/fonts.css">
+<meta property="og:image" content="https://sophia-zhang101.github.io/images/hero-33168-cream-gold-earrings.jpg">
+<link rel="preload" href="/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jost-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -60,6 +61,13 @@
 }
 </script>
 <style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/cormorant-garamond-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/cormorant-garamond-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/cormorant-garamond-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/cormorant-garamond-latin-400-italic.woff2) format('woff2')}
+@font-face{font-family:'Jost';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/jost-latin-300-normal.woff2) format('woff2')}
+@font-face{font-family:'Jost';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/jost-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Jost';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/jost-latin-500-normal.woff2) format('woff2')}
 :root{--bg:#FBFAF7;--panel:#F2EEE7;--ink:#1C1B19;--soft:#5F594F;--mute:#6B655C;--line:#E2DBD0;--brand:#772D22;--dark:#1C1B19;--darkink:#EDE8DF;--darksoft:#CFC8BC;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost',system-ui,sans-serif}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -87,12 +95,28 @@ header.top img{height:46px;width:auto}
 nav{display:flex;gap:28px;flex-wrap:wrap;font-size:14px;letter-spacing:.12em;text-transform:uppercase}
 nav a{text-decoration:none;padding:10px 0}
 
-.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:64px;align-items:center;padding-top:72px;padding-bottom:112px}
-.hero h1{font-size:clamp(46px,6.4vw,84px);line-height:1.05}
+.hero .wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:center;padding-top:72px;padding-bottom:112px}
+.hero h1{font-size:clamp(40px,5vw,68px);line-height:1.08}
 .hero .zh{font-family:var(--serif);font-size:20px;color:var(--mute);letter-spacing:.2em;margin-top:-6px}
 .hero-copy{display:flex;flex-direction:column;gap:26px}
 .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;padding-top:6px}
-.hero-img{aspect-ratio:4/5;object-fit:cover;width:100%;background:#fff}
+.hero-gallery{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
+.hero-gallery figure{display:flex;flex-direction:column;gap:10px;min-width:0}
+.hero-gallery .main{grid-row:span 2}
+.hero-gallery img{width:100%;object-fit:cover;background:#EEEDEB}
+.hero-gallery .main img{aspect-ratio:4/5}
+.hero-gallery .side img{aspect-ratio:1/1}
+.hero-gallery figcaption{display:flex;flex-direction:column;gap:1px;font-size:12px;letter-spacing:.04em;color:var(--mute);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-gallery figcaption b{white-space:normal;font-family:var(--serif);font-weight:500;font-size:18px;letter-spacing:0;color:var(--ink)}
+.hero-gallery figcaption span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:1px;background:var(--dot);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.plink{display:flex;flex-direction:column;gap:inherit;text-decoration:none;color:inherit;height:100%}
+.plink img{transition:opacity .25s}
+.plink:hover img{opacity:.88}
+.plink:hover b,.plink:hover p{color:var(--brand)}
+.plink:focus-visible{outline:2px solid var(--brand);outline-offset:4px}
+.hero-gallery .main .plink img{aspect-ratio:4/5}
+.tones{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;letter-spacing:.1em;color:var(--soft)}
+.tones span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:0;background:var(--dot);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
 .facts{display:flex;gap:40px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line);margin-top:6px}
 .facts div{display:flex;flex-direction:column}
 .facts b{font-family:var(--serif);font-weight:500;font-size:30px;color:var(--brand);line-height:1.2}
@@ -215,6 +239,8 @@ footer img{height:38px;width:auto}
  .roles li{grid-template-columns:1fr;gap:2px}
  .contact dl{grid-template-columns:1fr}.contact dt{border-bottom:0;padding-bottom:0}
  .facts{gap:24px}
+ .hero-gallery{grid-template-columns:1fr 1fr;gap:14px}
+ .hero-gallery .main{grid-row:auto;grid-column:span 2}
  .faq summary{font-size:21px}
 }
 </style>
@@ -227,7 +253,7 @@ footer img{height:38px;width:auto}
   <div class="wrap">
     <a href="#top" aria-label="XIAI JEWELRY home"><img src="images/logo-horizontal.png" alt="XIAI JEWELRY 玺爱珠宝" width="238" height="46"></a>
     <nav aria-label="Main">
-      <a href="#collections">Jewelry</a>
+      <a href="/products">Jewelry</a>
       <a href="#pearls">Pearls</a>
       <a href="#story">Our Story</a>
       <a href="#craft">Craft</a>
@@ -242,12 +268,17 @@ footer img{height:38px;width:auto}
 <section class="hero" id="top">
   <div class="wrap">
     <div class="hero-copy">
-      <p class="eyebrow">Saltwater &amp; freshwater pearl jewelry</p>
-      <h1>Because it&rsquo;s XiAi,<br>it&rsquo;s love at first sight.</h1>
+      <p class="eyebrow">Saltwater pearl jewelry · Shanxiahu, Zhuji</p>
+      <h1>Because it&rsquo;s XiAi,<br>it&rsquo;s love at first&nbsp;sight.</h1>
       <p class="zh">因为玺爱，所以喜爱</p>
-      <p class="lead">XIAI Jewelry is rooted in Shanxiahu, Zhuji, in Zhejiang Province. We bring together South Sea gold, Australian white, Tahitian, Akoya, Mabe and freshwater pearls and turn them into necklaces, earrings, rings and more — with pearl selection, design, crafting and personal advice for everyday wear and life&#39;s important moments.</p>
+      <p class="lead">Golden, white South Sea and Tahitian pearls — alongside Akoya, Mabe and freshwater — chosen at the source in Shanxiahu and set into necklaces, earrings, rings and more, in 18K gold or sterling silver. For everyday wear and life&#39;s important moments.</p>
+      <div class="tones" aria-label="Pearl colours in the collection">
+        <span style="--dot:#D9B46A">Golden</span>
+        <span style="--dot:#F3F1EC">White South Sea</span>
+        <span style="--dot:#8E9A9B">Tahitian grey</span>
+      </div>
       <div class="hero-ctas">
-        <a class="btn solid" href="#collections">Explore Pearl Jewelry</a>
+        <a class="btn solid" href="/products">Explore Pearl Jewelry</a>
         <a class="btn line" href="#contact">Ask Us About a Piece</a>
       </div>
       <div class="facts">
@@ -256,7 +287,20 @@ footer img{height:38px;width:auto}
         <div><b>8</b><span>Pearl types offered</span></div>
       </div>
     </div>
-    <img class="hero-img" src="images/hero-gold-pendant.jpg" alt="South Sea gold pearl pendant on a fine gold chain" width="1600" height="1600" fetchpriority="high">
+    <div class="hero-gallery">
+      <figure class="main"><a class="plink" href="/products/33168">
+        <img src="images/hero-33168-cream-gold-earrings.jpg" alt="Cream-gold saltwater pearl earrings, 13–14 mm, under oval 18K gold settings with cubic zirconia (XIAI 33168)" width="1200" height="1500" fetchpriority="high">
+        <figcaption><b>Cream-Gold Pearl Earrings</b><span style="--dot:#D9B46A">Cream-gold saltwater · 13–14 mm · No. 33168</span></figcaption></a>
+      </figure>
+      <figure class="side"><a class="plink" href="/products/62038">
+        <img src="images/hero-62038-white-south-sea-ring.jpg" alt="White South Sea pearl ring, 12–13 mm pearl on a multi-line 18K gold band (XIAI 62038)" width="900" height="900" loading="eager">
+        <figcaption><b>White South Sea Ring</b><span style="--dot:#E9E6DF">White · 12–13 mm · No. 62038</span></figcaption></a>
+      </figure>
+      <figure class="side"><a class="plink" href="/products/34108">
+        <img src="images/hero-34108-tahitian-earrings.jpg" alt="Platinum-grey Tahitian pearl drop earrings, 11–12 mm, with interlaced 18K gold tops (XIAI 34108)" width="900" height="900" loading="eager">
+        <figcaption><b>Tahitian Drop Earrings</b><span style="--dot:#8E9A9B">Grey · 11–12 mm · No. 34108</span></figcaption></a>
+      </figure>
+    </div>
   </div>
 </section>
 
@@ -267,12 +311,12 @@ footer img{height:38px;width:auto}
       <p class="lead" style="max-width:26em">Choose by budget, length, pearl size and how you like to wear it. We are happy to help you decide.</p>
     </div>
     <div class="cats">
-      <article class="cat"><img src="images/cat-necklaces.jpg" alt="Purple pearl strand necklace" loading="lazy" width="900" height="900"><h3>Necklaces</h3><p>Saltwater and freshwater pearls in a range of chain styles — for everyday styling, the office or as a gift. Choose by budget, length and pearl size.</p></article>
-      <article class="cat"><img src="images/cat-earrings.jpg" alt="White and gold pearl drop earrings with bow detail" loading="lazy" width="900" height="900"><h3>Earrings</h3><p>Classic studs, drops and statement designs that frame the face. Choose by pearl size and how you usually wear earrings.</p></article>
-      <article class="cat"><img src="images/cat-rings.jpg" alt="White pearl ring with pavé band" loading="lazy" width="900" height="900"><h3>Rings</h3><p>Different pearl types and settings, for daily wear or a keepsake gift. Check ring size, pearl size and metal before ordering.</p></article>
-      <article class="cat"><img src="images/cat-bracelets.jpg" alt="Gold pearl bracelet with fine chain" loading="lazy" width="900" height="900"><h3>Bracelets</h3><p>Beaded strands, station chains and designer pieces for everyday styling and gifting. Choose by wrist size, length and style.</p></article>
-      <article class="cat"><img src="images/cat-pendants.jpg" alt="Pearl pendant in a gold frame setting" loading="lazy" width="900" height="900"><h3>Pendants</h3><p>A single pearl, set to shine — from minimal to ornate. Easy to pair with chains you already own.</p></article>
-      <article class="cat"><img src="images/cat-brooches.jpg" alt="Gold camellia brooch with a golden pearl centre" loading="lazy" width="900" height="900"><h3>Brooches</h3><p>Sculptural pieces that lift a shirt, knit or evening dress. Choose by design and the occasion.</p></article>
+      <article class="cat"><a class="plink" href="/products#necklaces"><img src="images/cat-necklaces.jpg" alt="Purple pearl strand necklace" loading="lazy" width="900" height="900"><h3>Necklaces</h3></a><p>Saltwater and freshwater pearls in a range of chain styles — for everyday styling, the office or as a gift. Choose by budget, length and pearl size.</p><a class="textlink" href="/products#necklaces">View necklaces (10)</a></article>
+      <article class="cat"><a class="plink" href="/products#earrings"><img src="images/cat-earrings.jpg" alt="White and gold pearl drop earrings with bow detail" loading="lazy" width="900" height="900"><h3>Earrings</h3></a><p>Classic studs, drops and statement designs that frame the face. Choose by pearl size and how you usually wear earrings.</p><a class="textlink" href="/products#earrings">View earrings (5)</a></article>
+      <article class="cat"><a class="plink" href="/products#rings"><img src="images/cat-rings.jpg" alt="White pearl ring with pavé band" loading="lazy" width="900" height="900"><h3>Rings</h3></a><p>Different pearl types and settings, for daily wear or a keepsake gift. Check ring size, pearl size and metal before ordering.</p><a class="textlink" href="/products#rings">View rings (5)</a></article>
+      <article class="cat"><a class="plink" href="/products#bracelets"><img src="images/cat-bracelets.jpg" alt="Gold pearl bracelet with fine chain" loading="lazy" width="900" height="900"><h3>Bracelets</h3></a><p>Beaded strands, station chains and designer pieces for everyday styling and gifting. Choose by wrist size, length and style.</p><a class="textlink" href="/products#bracelets">View bracelets (1)</a></article>
+      <article class="cat"><a class="plink" href="/products#pendants"><img src="images/cat-pendants.jpg" alt="Pearl pendant in a gold frame setting" loading="lazy" width="900" height="900"><h3>Pendants</h3></a><p>A single pearl, set to shine — from minimal to ornate. Easy to pair with chains you already own.</p><a class="textlink" href="/products#pendants">View pendants (1)</a></article>
+      <article class="cat"><a class="plink" href="/products#brooches"><img src="images/cat-brooches.jpg" alt="Gold camellia brooch with a golden pearl centre" loading="lazy" width="900" height="900"><h3>Brooches</h3></a><p>Sculptural pieces that lift a shirt, knit or evening dress. Choose by design and the occasion.</p><a class="textlink" href="/products#brooches">View brooches (2)</a></article>
     </div>
   </div>
 </section>
@@ -313,8 +357,8 @@ footer img{height:38px;width:auto}
     <div class="sigs">
       <figure class="sig"><img src="images/sig-gold-earrings.jpg" alt="South Sea gold pearl drop earrings" loading="lazy" width="1200" height="1200"><p>South Sea gold pearl drop earrings</p></figure>
       <figure class="sig"><img src="images/sig-mabe-ring.jpg" alt="Mabe pearl cocktail ring with pavé halo" loading="lazy" width="1200" height="1200"><p>Mabe pearl cocktail ring</p></figure>
-      <figure class="sig"><img src="images/pendant-drop.jpg" alt="Teardrop Mabe pearl pendant in gold" loading="lazy"><p>Teardrop Mabe pearl pendant</p></figure>
-      <figure class="sig"><img src="images/earring-round.jpg" alt="Pearl drop earrings on fine gold chains" loading="lazy"><p>Two-pearl chain drop earrings</p></figure>
+      <figure class="sig"><a class="plink" href="/products/14121"><img src="images/sig-14121-mixed-saltwater-necklace.jpg" alt="Mixed saltwater pearl necklace with Tahitian, golden, white South Sea and Akoya pearls on 18K gold (XIAI 14121)" loading="lazy" width="1200" height="1500"><p>Mixed saltwater pearl necklace</p></a></figure>
+      <figure class="sig"><a class="plink" href="/products/53070"><img src="images/sig-53070-cream-gold-bracelet.jpg" alt="Cream-gold pearl bracelet, 9–12 mm pearls with 18K gold links (XIAI 53070)" loading="lazy" width="1200" height="1500"><p>Cream-gold pearl bracelet</p></a></figure>
     </div>
   </div>
 </section>
