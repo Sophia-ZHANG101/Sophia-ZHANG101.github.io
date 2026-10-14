@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sophia-zhang101.github.io/sitemap.xml
+Sitemap: https://xiai-jewelry.github.io/sitemap.xml
