@@ -95,7 +95,7 @@ for c in CATEGORIES:
 # AI-generated campaign images (Canva, made with photos of the real piece as
 # reference). Each must name a real item; delete an entry to drop the image.
 CAMPAIGN = {
-    "hero": dict(src="/images/campaign/hero-33168.jpg", sku="33168"),
+    "hero": dict(src="/images/campaign/hero-33168.jpg", sku="33168", pos="74% 35%"),
     "mixed": dict(src="/images/campaign/mixed-14121.jpg", sku="14121"),
     "ring": dict(src="/images/campaign/ring-63034.jpg", sku="63034"),
 }
@@ -342,7 +342,7 @@ def home():
     mixed = ""
     if "mixed" in CAMPAIGN:
         mixed = f"""<section class="split" aria-label="Mixed pearls">
-  <div class="media"><img src="{CAMPAIGN['mixed']['src']}" alt="Model in a white shirt wearing a necklace of mixed saltwater pearls" width="1080" height="1350" loading="lazy"></div>
+  <div class="media"><img src="{CAMPAIGN['mixed']['src']}" alt="Model in a white shirt wearing a necklace of mixed saltwater pearls" width="{size(CAMPAIGN['mixed']['src'])[0]}" height="{size(CAMPAIGN['mixed']['src'])[1]}" loading="lazy"></div>
   <div class="copy">
     <h2>Why choose one colour?</h2>
     <p>Tahitian, golden, white South Sea and Akoya pearls in varied sizes on one fine 18K gold chain, in 43 cm or 46 cm.</p>
@@ -354,7 +354,7 @@ def home():
     ring = ""
     if "ring" in CAMPAIGN:
         ring = f"""<section class="split rev lilac" aria-label="Rings">
-  <div class="media"><img src="{CAMPAIGN['ring']['src']}" alt="Hand on a camel coat wearing a golden pearl ring" width="1080" height="1350" loading="lazy"></div>
+  <div class="media"><img src="{CAMPAIGN['ring']['src']}" alt="Hand on a camel coat wearing a golden pearl ring" width="{size(CAMPAIGN['ring']['src'])[0]}" height="{size(CAMPAIGN['ring']['src'])[1]}" loading="lazy"></div>
   <div class="copy">
     <h2>A golden pearl, close up</h2>
     <p>A 12–13 mm golden pearl inside a swirl of small stones. See all seven rings, from a three-pearl Akoya band to Tahitian statement pieces.</p>
@@ -500,7 +500,7 @@ def product(p):
     if sku in WORN:
         worn = f"""<section class="sec tight" aria-labelledby="worn-h">
   <div class="wrap worn">
-    <img src="{WORN[sku]['src']}" alt="Model wearing the {e(name)}" width="1080" height="1350" loading="lazy">
+    <img src="{WORN[sku]['src']}" alt="Model wearing the {e(name)}" width="{size(WORN[sku]['src'])[0]}" height="{size(WORN[sku]['src'])[1]}" loading="lazy"{f' style="object-position:{WORN[sku]["pos"]}"' if WORN[sku].get("pos") else ""}>
     <div><h2 id="worn-h">As worn</h2><p>{e(p['for'])}</p><p class="ai">AI-generated image, made with photos of this piece. The photos above show the actual jewellery.</p></div>
   </div>
 </section>"""
