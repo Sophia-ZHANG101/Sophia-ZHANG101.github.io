@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人形机器人供应链拆解图</title>
+<style>
+/* 布局思路：工程图纸。左边是可悬停的机器人线稿，右边是该部位的采购档案卡。 */
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --ink:#14233b; --muted:#5b6b82;
+  --line:#b9c4d4; --part:#dfe6ef; --accent:#c8410c; --accent-soft:#ffe3d3;
+  --grid:rgba(20,35,59,.06);
+  --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1a2b; --surface:#17253a; --ink:#e6edf7; --muted:#93a4bd;
+    --line:#3a4c68; --part:#22344f; --accent:#ff8a4c; --accent-soft:#4a2a1a;
+    --grid:rgba(230,237,247,.05); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1a2b; --surface:#17253a; --ink:#e6edf7; --muted:#93a4bd;
+  --line:#3a4c68; --part:#22344f; --accent:#ff8a4c; --accent-soft:#4a2a1a;
+  --grid:rgba(230,237,247,.05); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body);
+  font-size:15px; line-height:1.6;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+.wrap{max-width:1120px; margin:0 auto; padding:28px 20px 40px; display:flex; flex-direction:column; gap:20px}
+header{display:flex; flex-direction:column; gap:6px}
+.eyebrow{font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; color:var(--muted)}
+h1{font-size:28px; line-height:1.25; margin:0; text-wrap:balance}
+.lede{color:var(--muted); margin:0; max-width:46em}
+.facts{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px}
+.fact{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:12px 14px}
+.fact b{display:block; font-family:var(--font-mono); font-size:22px; font-weight:600; font-variant-numeric:tabular-nums}
+.fact span{font-size:13px; color:var(--muted)}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{
+  font:inherit; font-size:14px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--line); border-radius:999px; padding:6px 12px 6px 6px;
+  display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+}
+.chip i{
+  font-style:normal; font-family:var(--font-mono); font-size:12px; font-weight:600;
+  width:22px; height:22px; border-radius:50%; display:grid; place-items:center;
+  background:var(--part); color:var(--ink);
+}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.chip[aria-pressed="true"] i{background:var(--accent); color:#fff}
+.chip:focus-visible,.part:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.stage{display:grid; grid-template-columns:minmax(260px,380px) 1fr; gap:20px; align-items:start}
+.figure{
+  background:var(--surface); border:1px solid var(--line); border-radius:6px;
+  padding:12px; position:sticky; top:16px;
+}
+.figure svg{display:block; width:100%; height:auto; max-height:76vh}
+.figure p{margin:8px 4px 2px; font-size:13px; color:var(--muted)}
+.part{cursor:pointer; outline:none}
+.part .shape{fill:var(--part); stroke:var(--line); stroke-width:1.5; transition:fill .15s,stroke .15s}
+.part.on .shape{fill:var(--accent-soft); stroke:var(--accent); stroke-width:2}
+.detail-line{fill:none; stroke:var(--line); stroke-width:1.2; pointer-events:none}
+.badge circle{fill:var(--ink)}
+.badge text{fill:var(--bg); font-family:var(--font-mono); font-size:10px; font-weight:600; text-anchor:middle; dominant-baseline:central}
+.badge{pointer-events:none}
+.badge.on circle{fill:var(--accent)}
+.badge.on text{fill:#fff}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:20px 22px; display:flex; flex-direction:column; gap:18px; min-width:0}
+.card-head{display:flex; flex-direction:column; gap:4px; border-bottom:1px solid var(--line); padding-bottom:14px}
+.card-head .no{font-family:var(--font-mono); font-size:12px; color:var(--accent); letter-spacing:.08em}
+.card-head h2{font-size:22px; margin:0; line-height:1.3}
+.card-head p{margin:0; color:var(--muted)}
+.verdicts{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px}
+.verdict{border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:4px; padding:10px 12px}
+.verdict small{display:block; font-size:12px; color:var(--muted); letter-spacing:.04em}
+.verdict strong{display:block; font-size:16px; line-height:1.35; margin:2px 0}
+.verdict span{font-size:13px; color:var(--muted)}
+h3{font-size:13px; font-weight:600; letter-spacing:.06em; color:var(--muted); margin:0 0 8px}
+ul.bom{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:4px}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:460px}
+th,td{text-align:left; padding:7px 10px 7px 0; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-size:12px; font-weight:600; color:var(--muted)}
+td:first-child{font-weight:600; white-space:nowrap}
+.tag{font-size:12px; border:1px solid var(--line); border-radius:3px; padding:1px 6px; white-space:nowrap}
+.tag.t1{border-color:var(--accent); color:var(--accent)}
+.clusters{display:flex; flex-wrap:wrap; gap:8px}
+.cluster{border:1px dashed var(--line); border-radius:4px; padding:6px 10px; font-size:14px}
+.cluster b{font-weight:600}
+.cluster span{color:var(--muted); font-size:13px}
+.note{background:var(--bg); border-radius:4px; padding:10px 12px; font-size:14px}
+.note b{color:var(--accent)}
+footer{font-size:13px; color:var(--muted); display:flex; flex-direction:column; gap:6px}
+footer a{color:inherit}
+footer ol{margin:0; padding-left:20px; columns:2; column-gap:32px}
+@media (max-width:760px){
+  .stage{grid-template-columns:1fr}
+  .figure{position:static}
+  .figure svg{max-height:420px}
+  h1{font-size:23px}
+  footer ol{columns:1}
+}
+@media (prefers-reduced-motion:reduce){.part .shape{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">HUMANOID BOM TEARDOWN · 数据截至 2026 年 11 月 · 演示版</div>
+    <h1>人形机器人供应链拆解图</h1>
+    <p class="lede">鼠标停在机器人的任意部位，右边会拆出它由什么构成、谁做得最好、哪里买最划算、产业集群在哪。点击可以锁定，手机上直接点下面的编号。</p>
+  </header>
+
+  <section class="facts" aria-label="整机成本概览">
+    <div class="fact"><b>70%+</b><span>硬件占整机 BOM 的比例</span></div>
+    <div class="fact"><b>73%</b><span>三大执行器（直线、旋转、灵巧手）占核心零部件价值</span></div>
+    <div class="fact"><b>约 17%</b><span>灵巧手占特斯拉 Optimus 物料成本（摩根士丹利测算）</span></div>
+    <div class="fact"><b>4 城</b><span>杭州、宁波、深圳、苏州，短半径内能配齐大部分零件</span></div>
+  </section>
+
+  <nav class="chips" id="chips" aria-label="部位列表"></nav>
+
+  <section class="stage">
+    <div class="figure">
+      <svg viewBox="40 6 280 580" role="group" aria-label="人形机器人正面线稿，可悬停或点击各部位">
+        <g id="robot">
+          <!-- 结构件 -->
+          <g class="part" data-part="shell" tabindex="0" role="button" aria-label="骨架与外壳">
+            <rect class="shape" x="170" y="84" width="20" height="18" rx="4"/>
+            <rect class="shape" x="126" y="258" width="108" height="36" rx="10"/>
+            <rect class="shape" x="93" y="236" width="22" height="70" rx="9"/>
+            <rect class="shape" x="245" y="236" width="22" height="70" rx="9"/>
+            <rect class="shape" x="130" y="550" width="46" height="22" rx="8"/>
+            <rect class="shape" x="184" y="550" width="46" height="22" rx="8"/>
+          </g>
+          <!-- 头 -->
+          <g class="part" data-part="head" tabindex="0" role="button" aria-label="头部：视觉与感知">
+            <rect class="shape" x="148" y="18" width="64" height="68" rx="22"/>
+            <rect class="detail-line" x="158" y="40" width="44" height="16" rx="8"/>
+            <circle class="detail-line" cx="170" cy="48" r="3"/><circle class="detail-line" cx="190" cy="48" r="3"/>
+          </g>
+          <!-- 胸腔 -->
+          <g class="part" data-part="compute" tabindex="0" role="button" aria-label="胸腔：主控算力">
+            <rect class="shape" x="120" y="100" width="120" height="90" rx="14"/>
+            <rect class="detail-line" x="160" y="125" width="40" height="40" rx="3"/>
+            <path class="detail-line" d="M168 125v-7M180 125v-7M192 125v-7M168 165v7M180 165v7M192 165v7M160 133h-7M160 145h-7M160 157h-7M200 133h7M200 145h7M200 157h7"/>
+          </g>
+          <!-- 电池 -->
+          <g class="part" data-part="battery" tabindex="0" role="button" aria-label="腹部：电池包">
+            <rect class="shape" x="132" y="194" width="96" height="60" rx="10"/>
+            <path class="detail-line" d="M148 206v36M164 206v36M196 206v36M212 206v36"/>
+          </g>
+          <!-- 直线执行器 -->
+          <g class="part" data-part="linear" tabindex="0" role="button" aria-label="大臂与腿：直线执行器">
+            <rect class="shape" x="92" y="138" width="24" height="72" rx="10"/>
+            <rect class="shape" x="244" y="138" width="24" height="72" rx="10"/>
+            <rect class="shape" x="140" y="316" width="28" height="98" rx="12"/>
+            <rect class="shape" x="192" y="316" width="28" height="98" rx="12"/>
+            <rect class="shape" x="142" y="440" width="24" height="96" rx="10"/>
+            <rect class="shape" x="194" y="440" width="24" height="96" rx="10"/>
+            <path class="detail-line" d="M206 330v70M206 452v72M256 150v48"/>
+          </g>
+          <!-- 旋转关节 -->
+          <g class="part" data-part="rotary" tabindex="0" role="button" aria-label="肩肘髋膝：旋转关节">
+            <circle class="shape" cx="104" cy="118" r="18"/><circle class="shape" cx="256" cy="118" r="18"/>
+            <circle class="shape" cx="104" cy="223" r="13"/><circle class="shape" cx="256" cy="223" r="13"/>
+            <circle class="shape" cx="154" cy="302" r="14"/><circle class="shape" cx="206" cy="302" r="14"/>
+            <circle class="shape" cx="154" cy="427" r="13"/><circle class="shape" cx="206" cy="427" r="13"/>
+            <circle class="detail-line" cx="256" cy="118" r="8"/><circle class="detail-line" cx="206" cy="302" r="6"/>
+            <circle class="detail-line" cx="256" cy="223" r="5"/><circle class="detail-line" cx="206" cy="427" r="5"/>
+          </g>
+          <!-- 腕踝力传感器 -->
+          <g class="part" data-part="force" tabindex="0" role="button" aria-label="手腕脚踝：六维力传感器">
+            <rect class="shape" x="94" y="308" width="20" height="11" rx="3"/>
+            <rect class="shape" x="246" y="308" width="20" height="11" rx="3"/>
+            <rect class="shape" x="144" y="538" width="20" height="11" rx="3"/>
+            <rect class="shape" x="196" y="538" width="20" height="11" rx="3"/>
+          </g>
+          <!-- 手 -->
+          <g class="part" data-part="hand" tabindex="0" role="button" aria-label="手：灵巧手">
+            <rect class="shape" x="90" y="321" width="28" height="26" rx="7"/>
+            <rect class="shape" x="91" y="348" width="5" height="18" rx="2.5"/><rect class="shape" x="98" y="348" width="5" height="21" rx="2.5"/>
+            <rect class="shape" x="105" y="348" width="5" height="20" rx="2.5"/><rect class="shape" x="112" y="348" width="5" height="16" rx="2.5"/>
+            <rect class="shape" x="119" y="328" width="5" height="16" rx="2.5"/>
+            <rect class="shape" x="242" y="321" width="28" height="26" rx="7"/>
+            <rect class="shape" x="243" y="348" width="5" height="16" rx="2.5"/><rect class="shape" x="250" y="348" width="5" height="20" rx="2.5"/>
+            <rect class="shape" x="257" y="348" width="5" height="21" rx="2.5"/><rect class="shape" x="264" y="348" width="5" height="18" rx="2.5"/>
+            <rect class="shape" x="236" y="328" width="5" height="16" rx="2.5"/>
+          </g>
+          <!-- 编号 -->
+          <g class="badge" data-badge="head"><circle cx="216" cy="24" r="9"/><text x="216" y="24">1</text></g>
+          <g class="badge" data-badge="compute"><circle cx="134" cy="114" r="9"/><text x="134" y="114">2</text></g>
+          <g class="badge" data-badge="battery"><circle cx="180" cy="224" r="9"/><text x="180" y="224">3</text></g>
+          <g class="badge" data-badge="rotary"><circle cx="104" cy="118" r="9"/><text x="104" y="118">4</text></g>
+          <g class="badge" data-badge="linear"><circle cx="154" cy="365" r="9"/><text x="154" y="365">5</text></g>
+          <g class="badge" data-badge="hand"><circle cx="72" cy="340" r="9"/><text x="72" y="340">6</text></g>
+          <g class="badge" data-badge="force"><circle cx="72" cy="313" r="9"/><text x="72" y="313">7</text></g>
+          <g class="badge" data-badge="shell"><circle cx="180" cy="276" r="9"/><text x="180" y="276">8</text></g>
+        </g>
+      </svg>
+      <p id="hint">悬停预览，点击锁定。当前锁定：<span id="pinned">6 灵巧手</span></p>
+    </div>
+
+    <article class="card" id="card" aria-live="polite"></article>
+  </section>
+
+  <footer>
+    <div><b>怎么读这张图：</b>这是演示数据，把公开报道和券商研报里的说法整理到了一起。很多"第一"来自厂商或单一机构的口径，互相打架的地方已经标出来。价格是区间量级，真要采购请向厂商询价核实。</div>
+    <div>主要来源：</div>
+    <ol>
+      <li><a href="https://news.sina.cn/bignews/insight/2026-06-05/detail-iniakfhp1604635.d.html">新浪 BigNews：中国供应链如何让人形机器人成本三年降 70%</a></li>
+      <li><a href="https://www.36kr.com/p/3934402091351433">36氪 / 定焦One：灵巧手还没跑出"标准手"</a></li>
+      <li><a href="https://www.36kr.com/p/3896894670768008">36氪 / 亿欧：灵巧手的"贵"与"便宜"</a></li>
+      <li><a href="https://m.jiemian.com/article/15040195.html">界面新闻：行星滚柱丝杠</a></li>
+      <li><a href="https://www.jtcopper.com/wp-content/uploads/2026/05/人形机器人：量产突破期的产业分化与国有资本投资逻辑.pdf">行业研究：量产突破期的产业分化</a></li>
+      <li><a href="https://news.pedaily.cn/202608/568352.shtml">投资界：人形机器人六维力传感器报告</a></li>
+      <li><a href="https://stock.10jqka.com.cn/20260914/c679894703.shtml">同花顺：沙利文具身传感器报告</a></li>
+      <li><a href="https://hznews.hangzhou.com.cn/jingji/content/2026-09/10/content_9303178_2.htm">杭州网：长三角"3 小时交付圈"</a></li>
+      <li><a href="https://auto.sina.cn/2026-07-07/detail-inifwwms8579275.d.html">新浪：核心零部件国产替代分层</a></li>
+      <li><a href="https://pdf.dfcfw.com/pdf/H3_AP202506121689801194_1.pdf">东吴证券：机器人轻量化深度报告</a></li>
+    </ol>
+  </footer>
+</div>
+
+<script>
+var PARTS = [
+ {id:"head", no:1, name:"头部 · 视觉与感知", tagline:"机器人的眼睛：深度相机、激光雷达、麦克风阵列。感知硬件加上 AI 芯片只占核心零部件价值的 4.4% 左右，便宜但决定它看不看得清。",
+  verdicts:[
+   {k:"技术标杆", v:"RealSense（美国）", d:"科研和样机的默认深度相机"},
+   {k:"性价比首选", v:"奥比中光（深圳）", d:"结构光加 ToF 双路线，国产整机常用"},
+   {k:"最便宜的产地", v:"深圳", d:"摄像头模组、光学件就近配齐"}],
+  bom:["RGB 相机与深度相机（结构光、ToF 或双目）","激光雷达（部分机型不用，特斯拉走纯视觉）","麦克风阵列、扬声器、表情屏","外壳多为注塑或 PEEK、碳纤维"],
+  vendors:[
+   ["RealSense","美国加州","标杆","深度相机老牌，原英特尔业务独立而来"],
+   ["奥比中光 Orbbec","深圳","性价比","3D 视觉国产龙头"],
+   ["览沃 Livox","深圳","性价比","小型激光雷达，四足和人形上常见"],
+   ["禾赛 / 速腾聚创","上海 / 深圳","量产","车规激光雷达厂转做机器人"]],
+  clusters:[["深圳","光学、模组、激光雷达"],["上海","激光雷达、算法公司"],["美国加州","高端深度相机设计"]],
+  tip:"做样机先用现成深度相机模组，别自研光学。量上来之后再谈定制。",
+  caveat:"3D 视觉国产化率在加速替代区间（约 40% 到 70%），不同报告口径不一。"},
+
+ {id:"compute", no:2, name:"胸腔 · 主控算力", tagline:"机器人的大脑硬件。端侧跑视觉和动作模型，这一块是全身最难国产替代的地方之一。",
+  verdicts:[
+   {k:"技术标杆", v:"NVIDIA Jetson 系列", d:"生态和工具链事实上的行业标准"},
+   {k:"性价比首选", v:"地平线 / 瑞芯微方案", d:"算力低一档，价格低很多"},
+   {k:"最便宜的产地", v:"深圳（板卡）", d:"芯片本身在台湾代工，板卡和整机在珠三角"}],
+  bom:["AI 计算模组（GPU 或 NPU）","运动控制板（实时控制关节，俗称小脑）","电源管理、通信（EtherCAT 或 CAN）","散热：风冷或均热板"],
+  vendors:[
+   ["NVIDIA","美国加州设计，台积电代工","标杆","Jetson Orin、Thor"],
+   ["地平线（地瓜机器人）","北京 / 深圳","性价比","RDK 开发套件，价格友好"],
+   ["瑞芯微","福州","最便宜","RK3588 类方案，轻量机型常用"],
+   ["英特尔","美国","备选","部分整机做运动控制"]],
+  clusters:[["台湾新竹","先进制程代工"],["深圳","板卡设计、贴片、整机"],["美国硅谷","芯片与软件生态"]],
+  tip:"判断一家整机公司的大脑成本，看它用 Jetson 哪一档。高端档位一块模组就是几千美元。",
+  caveat:"高端 AI 芯片受出口管制影响，供应情况会变，这里只列格局不列价格。"},
+
+ {id:"battery", no:3, name:"腹部 · 电池包", tagline:"电芯直接复用电动车和消费电子供应链，是全身最成熟、最不稀缺的一块，价值占比只有个位数百分比。",
+  verdicts:[
+   {k:"技术标杆", v:"宁德时代 / 松下 / LG 新能源", d:"电芯一致性和安全性最好"},
+   {k:"性价比首选", v:"亿纬锂能、欣旺达", d:"圆柱电芯和 Pack 一体供货"},
+   {k:"最便宜的产地", v:"广东、福建", d:"电芯、BMS、结构件都在本地"}],
+  bom:["锂电芯（圆柱 21700 类或软包）","BMS 电池管理板","Pack 结构件、热管理、快换接口"],
+  vendors:[
+   ["宁德时代 CATL","福建宁德","标杆","全球动力电池第一"],
+   ["亿纬锂能","广东惠州","性价比","圆柱电芯强"],
+   ["欣旺达","深圳","性价比","消费电子 Pack 起家"],
+   ["松下 / LG / 三星 SDI","日本 / 韩国","标杆","海外整机常用"]],
+  clusters:[["福建宁德","电芯"],["珠三角（深圳、惠州、东莞）","Pack、BMS"],["日韩","高端电芯"]],
+  tip:"电池不是瓶颈，续航才是。多数机型一块电只能干一两个小时，所以快换设计比电芯选型更值得看。",
+  caveat:"下一代看固态电池，目前还在送样阶段。"},
+
+ {id:"rotary", no:4, name:"肩肘髋膝 · 旋转关节", tagline:"一个关节等于谐波减速器加无框力矩电机加编码器加驱动器。这是中国供应链降价最猛的地方。",
+  verdicts:[
+   {k:"技术标杆", v:"哈默纳科（日本）", d:"谐波减速器的发明者和天花板"},
+   {k:"性价比首选", v:"绿的谐波（苏州）", d:"2024 年全球谐波份额约 12%"},
+   {k:"最便宜的产地", v:"长三角、深圳", d:"国产谐波已降到 1320 到 2000 元一只"}],
+  bom:["谐波减速器（小关节）或行星减速器（大扭矩、抗冲击）","无框力矩电机","双编码器","驱动器、交叉滚子轴承、力矩传感器"],
+  vendors:[
+   ["哈默纳科 Harmonic Drive","日本长野","标杆","精度和寿命最好，贵且交期长"],
+   ["绿的谐波","苏州","性价比","国产谐波龙头"],
+   ["科尔摩根 Kollmorgen","美国","标杆","无框力矩电机标杆"],
+   ["步科股份","深圳 / 上海","性价比","无框电机已到第四代，指标接近科尔摩根"],
+   ["汇川技术","深圳 / 苏州","量产","电机、驱动、模组全做"],
+   ["宇树等整机厂","杭州","最便宜","关节自研自产，成本压到最低"]],
+  clusters:[["苏州","谐波减速器"],["深圳","电机、驱动器"],["日本长野","高端减速器"],["浙江（嵊州、台州）","减速器、轴承"]],
+  tip:"谐波从进口的 3000 到 5000 元降到国产 2000 元以内，伺服电机从 2000 元降到 500 元左右。想便宜就买国产，想要寿命和一致性再看日本货。",
+  caveat:"谐波和无框电机已基本完成国产替代，高端编码器和精密微型轴承仍有缺口。"},
+
+ {id:"linear", no:5, name:"大臂与腿 · 直线执行器", tagline:"核心是行星滚柱丝杠，把电机的旋转变成直线推力。特斯拉路线的标配，也是全身最难造、降本压力最大的零件之一。",
+  verdicts:[
+   {k:"技术标杆", v:"GSA、Rollvis（瑞士）", d:"Optimus Gen-2 的 14 根丝杠来自 GSA"},
+   {k:"性价比首选", v:"五洲新春（浙江）", d:"报道称已进入特斯拉 Gen3 供应链"},
+   {k:"最便宜的产地", v:"长三角", d:"宁波、绍兴、无锡、常州的汽车零部件厂在转产"}],
+  bom:["行星滚柱丝杠（丝杠、滚柱、螺母）","无框力矩电机（常做成电机即螺母的一体结构）","轴承、力传感器、编码器","材料多为轴承钢，难点在磨削和热处理"],
+  vendors:[
+   ["GSA","瑞士","标杆","特斯拉早期供应商"],
+   ["Rollvis / Ewellix","瑞士 / 瑞典","标杆","老牌滚柱丝杠"],
+   ["五洲新春","浙江绍兴新昌","性价比","轴承起家，规划大规模扩产"],
+   ["北特科技","上海","量产","汽车底盘件转丝杠"],
+   ["贝斯特 / 恒立液压","无锡 / 常州","量产","精密加工能力强"],
+   ["汇川技术","深圳 / 苏州","备选","已交付第一代丝杠产品"]],
+  clusters:[["瑞士","高精度滚柱丝杠"],["宁波、绍兴","轴承与丝杠"],["无锡、常州","精密磨削"],["上海","汽车零部件转型"]],
+  tip:"不是所有机器人都用丝杠。宇树这类跑跳型机器人腿上全是旋转关节，更便宜也更耐摔。丝杠路线适合要大负载、高精度的工厂机型。",
+  caveat:"丝杠国产化率各家说法差很大，2025 年有报告说不足 20%，2026 年有文章说已到 40% 到 70%。"},
+
+ {id:"hand", no:6, name:"手 · 灵巧手", tagline:"全身最贵的单一部件，占整机物料成本 15% 到 25%。行业还没有标准手：单价从三千多元到数十万元，自由度从 6 个到 42 个。",
+  verdicts:[
+   {k:"出货量第一", v:"因时机器人（北京）", d:"2025 年交付破 1 万台，已盈亏平衡"},
+   {k:"高自由度代表", v:"灵心巧手（北京）", d:"自称占全球高自由度市场 80% 以上"},
+   {k:"科研标杆", v:"Shadow Robot（英国）", d:"最像人手，也最贵"}],
+  bom:["微型驱动：空心杯电机或无刷电机加微型丝杠、腱绳、连杆","微型减速箱和精密齿轮","触觉传感器（指尖电子皮肤）","自润滑轴承、PEEK 或铝合金骨架"],
+  vendors:[
+   ["因时机器人 Inspire","北京","出货量","微型伺服电缸路线，量大价低"],
+   ["灵心巧手 Linkerbot","北京","高自由度","新一轮目标估值约 60 亿美元"],
+   ["特斯拉（自研）","美国","技术激进","Gen3 单手 22 自由度，单只成本超 6000 美元"],
+   ["Shadow Robot","英国伦敦","科研标杆","腱绳驱动，实验室用"],
+   ["兆威机电","深圳","上游","微型传动，也做整手"],
+   ["帕西尼感知","深圳","上游","触觉传感器"],
+   ["大寰机器人","深圳","性价比","电动夹爪起家，累计交付超 20 万套末端执行器"]],
+  clusters:[["北京","整手公司最集中"],["深圳、东莞","微型电机、齿轮、触觉传感器"],["瑞士、德国","高端空心杯电机（Maxon、Faulhaber）"]],
+  tip:"别问谁最好，先问你要干什么。搬箱子拧螺丝，6 自由度的便宜手够用。要做穿针引线级别的操作，才需要 20 自由度以上的贵手。",
+  caveat:"三家都说自己第一，口径不同：因时是出货量，灵心巧手是高自由度细分份额，大寰是所有末端执行器合计。另外寿命是大坑，有报道称 Optimus 的手在分拣训练里只撑了 6 周。"},
+
+ {id:"force", no:7, name:"手腕脚踝 · 六维力传感器", tagline:"让机器人知道自己用了多大力、脚下稳不稳。一台通常装 4 个。三年里价格从 10 万元掉到 5000 元以内。",
+  verdicts:[
+   {k:"技术标杆", v:"ATI（美国）", d:"精度和稳定性的行业参照"},
+   {k:"国产头部", v:"蓝点触控、坤维科技", d:"两家都有报告称自己份额第一"},
+   {k:"最便宜的产地", v:"中国", d:"国产单价已到 5000 元以内"}],
+  bom:["弹性体（铝合金或钛合金精密加工）","应变片或电容、光学敏感元件","信号调理与解耦算法板","标定是核心工艺，也是产能瓶颈"],
+  vendors:[
+   ["ATI","美国北卡","标杆","贵，交期长"],
+   ["Kistler","瑞士","标杆","测量仪器巨头"],
+   ["蓝点触控","北京","国产头部","一份报告称 2025 年人形份额 80.3%"],
+   ["坤维科技","常州","国产头部","沙利文称 2026 上半年人形份额 57%"],
+   ["柯力传感","宁波","量产","称重传感器龙头转型"]],
+  clusters:[["北京","航天系技术背景"],["常州","协作机器人配套"],["宁波","传感器制造"]],
+  tip:"买的时候看标定和温漂数据，不要只看量程和价格。便宜的传感器用几个月就漂。",
+  caveat:"蓝点 80.3% 和坤维 57% 两个数字来自不同机构、不同年份、不同统计口径，不能直接比。"},
+
+ {id:"shell", no:8, name:"骨架与外壳 · 轻量化材料", tagline:"铝合金是主力，镁合金和 PEEK 在加速替代。每减一公斤，续航和动态性能都会好一截。",
+  verdicts:[
+   {k:"技术标杆", v:"威格斯 Victrex（英国）", d:"PEEK 材料的全球龙头"},
+   {k:"性价比首选", v:"中研股份（长春）", d:"国产 PEEK 树脂已能自给"},
+   {k:"最便宜的产地", v:"东莞、宁波", d:"CNC 加工和压铸最密集"}],
+  bom:["铝合金 CNC 结构件（目前用量最大）","镁合金压铸件（密度约为铝的三分之二）","PEEK：齿轮、轴承保持架、连杆、外壳","碳纤维：小腿、前臂等受力杆件"],
+  vendors:[
+   ["威格斯 Victrex","英国","标杆","PEEK 发明者"],
+   ["世索科 Syensqo（原索尔维）","比利时","标杆","KetaSpire 系列"],
+   ["中研股份","吉林长春","性价比","国产 PEEK 龙头"],
+   ["沃特股份","深圳","性价比","特种工程塑料"],
+   ["宝武镁业","南京 / 巢湖","量产","镁合金原料到压铸"],
+   ["宁波华翔等","宁波","代工","汽车零部件厂做结构件和整机 ODM"]],
+  clusters:[["东莞、深圳","CNC 精密加工"],["宁波","压铸、注塑、模具"],["长春","PEEK 树脂"],["英国、比利时","高端 PEEK"]],
+  tip:"样机阶段全用 CNC 铝件最快。量产才值得开模做镁合金压铸和 PEEK 注塑，模具钱要靠量摊薄。",
+  caveat:"单台用 6 到 10 公斤 PEEK 的说法多来自材料商和代理商，实际用量各家差别很大。"}
+];
+
+var TAG_T1 = {"标杆":1,"出货量":1,"科研标杆":1,"国产头部":1};
+var byId = {}; PARTS.forEach(function(p){ byId[p.id] = p; });
+var pinned = "hand";
+var card = document.getElementById("card");
+var chips = document.getElementById("chips");
+var pinnedLabel = document.getElementById("pinned");
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+function render(id){
+  var p = byId[id]; if(!p) return;
+  var h = '<div class="card-head"><div class="no">部位 ' + p.no + ' / 8</div><h2>' + esc(p.name) + '</h2><p>' + esc(p.tagline) + '</p></div>';
+  h += '<div class="verdicts">' + p.verdicts.map(function(v){
+    return '<div class="verdict"><small>' + esc(v.k) + '</small><strong>' + esc(v.v) + '</strong><span>' + esc(v.d) + '</span></div>';
+  }).join("") + '</div>';
+  h += '<div><h3>由什么构成</h3><ul class="bom">' + p.bom.map(function(b){ return '<li>' + esc(b) + '</li>'; }).join("") + '</ul></div>';
+  h += '<div><h3>谁在做</h3><div class="tablebox"><table><thead><tr><th>公司</th><th>在哪</th><th>定位</th><th>说明</th></tr></thead><tbody>' +
+    p.vendors.map(function(v){
+      return '<tr><td>' + esc(v[0]) + '</td><td>' + esc(v[1]) + '</td><td><span class="tag' + (TAG_T1[v[2]] ? ' t1' : '') + '">' + esc(v[2]) + '</span></td><td>' + esc(v[3]) + '</td></tr>';
+    }).join("") + '</tbody></table></div></div>';
+  h += '<div><h3>产业集群</h3><div class="clusters">' + p.clusters.map(function(c){
+    return '<div class="cluster"><b>' + esc(c[0]) + '</b> <span>' + esc(c[1]) + '</span></div>';
+  }).join("") + '</div></div>';
+  h += '<div class="note"><b>采购提示　</b>' + esc(p.tip) + '</div>';
+  h += '<div class="note"><b>口径提醒　</b>' + esc(p.caveat) + '</div>';
+  card.innerHTML = h;
+  document.querySelectorAll(".part").forEach(function(g){ g.classList.toggle("on", g.dataset.part === id); });
+  document.querySelectorAll(".badge").forEach(function(g){ g.classList.toggle("on", g.dataset.badge === id); });
+  chips.querySelectorAll(".chip").forEach(function(c){ c.setAttribute("aria-pressed", c.dataset.part === pinned ? "true" : "false"); });
+}
+
+function pin(id){
+  pinned = id;
+  pinnedLabel.textContent = byId[id].no + " " + byId[id].name.split(" · ").pop();
+  render(id);
+}
+
+PARTS.forEach(function(p){
+  var b = document.createElement("button");
+  b.type = "button"; b.className = "chip"; b.dataset.part = p.id; b.id = "chip-" + p.id;
+  b.innerHTML = "<i>" + p.no + "</i>" + esc(p.name.split(" · ").pop());
+  b.addEventListener("click", function(){ pin(p.id); });
+  b.addEventListener("mouseenter", function(){ render(p.id); });
+  b.addEventListener("mouseleave", function(){ render(pinned); });
+  chips.appendChild(b);
+});
+
+document.querySelectorAll(".part").forEach(function(g){
+  var id = g.dataset.part;
+  g.addEventListener("mouseenter", function(){ render(id); });
+  g.addEventListener("mouseleave", function(){ render(pinned); });
+  g.addEventListener("focus", function(){ render(id); });
+  g.addEventListener("blur", function(){ render(pinned); });
+  g.addEventListener("click", function(){ pin(id); });
+  g.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); pin(id); } });
+});
+
+pin("hand");
+</script>
+</body>
+</html>
